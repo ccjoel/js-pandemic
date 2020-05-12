@@ -24,94 +24,81 @@
 
   <script type='text/javascript'>//<![CDATA[
     $(function() {
-    // You may use: https://developer.mozilla.org if you need help with syntax
-    // https://getfirebug.com/firebug-lite-debug.js as external resource for a build-in console window
+        // You may use: https://developer.mozilla.org if you need help with syntax
+        // https://getfirebug.com/firebug-lite-debug.js as external resource for a build-in console window
 
-    function Q1(number1, number2) {
-      var returnValue = "";
-    
-      //Q1 your code here
-    
-      return returnValue;
-    }
-    
-    /**
-     * Given number, returns if it palindrome
-     **/
-    function isPalindrome(num) {
-        const asString = num + '';
+        function Q1(number1, number2) {
+            var returnValue = "";
+            
+            //Q1 your code here
+            
+            return returnValue;
+        }
+        
+        /**
+         * Given number, returns if it palindrome
+         **/
+        function isPalindrome(num) {
+            const asString = num + '';
 
-        const reversed = asString
-            .split('')
-            .reverse()
-            .join('');
+            const reversed = asString
+                .split('')
+                .reverse()
+                .join('');
 
-        return asString === reversed;
-    }
-
-    function Q2(number1) {
-      var returnValue = "";
-    
-        /* 0
-         * "a" */
-        /* opsitive integer */
-        /* 1000000 number of digits */
-        /* 2^32 -1 */ /* most likely biggest js number */
-
-        const biggestJsNumber = 1000000; // assumption
-
-        // TODO validate input, validate output
-        for (let counter = number1 + 1; counter < biggestJsNumber; counter++) {
-            if (isPalindrome(counter)) {
-                return counter;
-            }
+            return asString === reversed;
         }
 
-      //Q2 your code here
+        function Q2(number1) {
+            var returnValue = "";
+            
+            /* 1000000 number of digits */
+            /* 2^32 -1 */ /* most likely biggest js number */
 
-      return returnValue;
-    }
-    
-    function Q3(string1) {
-        /* const sampleInput = 'aaabaaaaccaaaaba'; */
+            const biggestJsNumber = 1000000; // assumption
 
-        let accumulator = '';
-
-        for (
-            let index = 0,
-                previous = string1[0],
-                repeatCounter = 1;
-            index < string1.length - 1;
-            index++
-        ) {
-
-            const current = string1[index];
-
-            if (index === string1.length - 1) {
-                // TODO at end of string? back lookahead.
-            } else if (current === previous) {
-                repeatCounter++;
-            } else {
-                const count = repeatCounter > 1 ? repeatCounter : '';
-                accumulator += previous + count;
-                repeatCounter = 1;
-                previous = current;
+            // TODO validate input, validate output
+            for (let counter = number1 + 1; counter < biggestJsNumber; counter++) {
+                if (isPalindrome(counter)) {
+                    return counter;
+                }
             }
+
+            return returnValue;
         }
 
-        /* const output = 'a3ba4c2a4ba' */
-        // assume context of recursive solution
-        /* currentChar = input[0]; */
-        //
+        /**
+         * Given 'a', and 'aaab', returns 3
+         * Given 'a', and 'abb', returns 1
+         * Given 'a', and 'b', returns 0
+         * Given 'a', and 'b', returns 0
+         **/
+        function scanRepeated(character, str) {
+            const re = new RegExp(`${character}+`);
+            const result = str.match(re);
 
-        //Q3 your code here
+            return result ? result[0].length : 0;
+        }
 
-        return accumulator;
-    }
+        function Q3(string1) {
+            let accumulator = '';
+            let index = 0;
 
-    $("#results1").append(Q1(1, 100));
-    $("#results2").append(Q2(907008));
-    $("#results3").append(Q3("aaabaaaaccaaaaba"));
+            while (index < string1.length) {
+                const currentChar = string1[index];
+                const occurrences = scanRepeated(currentChar, string1.substring(index));
+                const displayCount = occurrences > 1 ? occurrences : '';
+
+                accumulator += currentChar + displayCount;
+                index += occurrences;
+            }
+
+            return accumulator;
+        }
+
+        $("#results1").append(Q1(1, 100));
+        $("#results2").append(Q2(907008));
+        $("#results3").append(Q3("aaabaaaaccaaaaba"));
 
     });//]]>
 
