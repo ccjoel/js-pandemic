@@ -1,0 +1,182 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="googlebot" content="noindex, nofollow">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.js"></script>
+
+  <style type="text/css">
+   p {
+       padding: 0px 0px 0px 15px;
+   }
+   #question {
+       border: 1px solid gray;
+   }
+   div {
+       padding: 15px 15px 15px 15px;
+       border: 1px solid blue;
+   }
+  </style>
+  <title> by ICS</title>
+
+  <script type='text/javascript'>//<![CDATA[
+    $(function() {
+    // You may use: https://developer.mozilla.org if you need help with syntax
+    // https://getfirebug.com/firebug-lite-debug.js as external resource for a build-in console window
+
+    function Q1(number1, number2) {
+      var returnValue = "";
+    
+      //Q1 your code here
+    
+      return returnValue;
+    }
+    
+    /**
+     * Given number, returns if it palindrome
+     **/
+    function isPalindrome(num) {
+        const asString = num + '';
+
+        const reversed = asString
+            .split('')
+            .reverse()
+            .join('');
+
+        return asString === reversed;
+    }
+
+    function Q2(number1) {
+      var returnValue = "";
+    
+        /* 0
+         * "a" */
+        /* opsitive integer */
+        /* 1000000 number of digits */
+        /* 2^32 -1 */ /* most likely biggest js number */
+
+        const biggestJsNumber = 1000000; // assumption
+
+        // TODO validate input, validate output
+        for (let counter = number1 + 1; counter < biggestJsNumber; counter++) {
+            if (isPalindrome(counter)) {
+                return counter;
+            }
+        }
+
+      //Q2 your code here
+
+      return returnValue;
+    }
+    
+    function Q3(string1) {
+        /* const sampleInput = 'aaabaaaaccaaaaba'; */
+
+        let accumulator = '';
+
+        for (
+            let index = 0,
+                previous = string1[0],
+                repeatCounter = 1;
+            index < string1.length - 1;
+            index++
+        ) {
+
+            const current = string1[index];
+
+            if (index === string1.length - 1) {
+                // TODO at end of string? back lookahead.
+            } else if (current === previous) {
+                repeatCounter++;
+            } else {
+                const count = repeatCounter > 1 ? repeatCounter : '';
+                accumulator += previous + count;
+                repeatCounter = 1;
+                previous = current;
+            }
+        }
+
+        /* const output = 'a3ba4c2a4ba' */
+        // assume context of recursive solution
+        /* currentChar = input[0]; */
+        //
+
+        //Q3 your code here
+
+        return accumulator;
+    }
+
+    $("#results1").append(Q1(1, 100));
+    $("#results2").append(Q2(907008));
+    $("#results3").append(Q3("aaabaaaaccaaaaba"));
+
+    });//]]>
+
+    </script>
+
+</head>
+
+<body>
+  <!--don't edit this file-->
+<div id=question>
+  <span style="font-weight:bold">Question 1:</span> Generate all prime numbers between two given numbers. 
+  The two numbers are parameters that can be passed into the function. A prime number is one that is only 
+  divisible by 1 and itself. Output the results into the results element below.
+  <p>
+    Example:
+    <br/> Primes between 1 and 10
+    <br/> Output:
+    <br/> 2
+    <br/> 3
+    <br/> 5
+    <br/> 7
+    <br/>
+  </p>
+</div>
+<br/>
+<p>Your Results:</p>
+<div id="results1"></div>
+<br/>
+<div id=question>
+<span style="font-weight:bold">Question 2:</span> A positive integer is called a palindrome if its 
+representation in the decimal system is the same when read from left to right and from right to left. 
+For a given positive integer K of not more than 1000000 digits, write the value of the smallest 
+palindrome larger than K to output. Numbers are always displayed without leading zeros.
+  <P>
+    Example:
+    <br/> Number Given: 808
+    <br/> Output: 818
+    <br/> Number Given: 2133
+    <br/> Output: 2222
+    <br/>
+  </P>
+</div>
+<br/>
+<p>Your Results:</p>
+<div id="results2"></div>
+<br/>
+<div id="question">
+  <span style="font-weight:bold">Question 3:</span> Write a simple string compression algorithm. 
+  If a character [ch] occurs n>1 times in a row, then it will be represented by [ch][n].
+  <P>
+    Example:
+    <br/> String Given: aaaa
+    <br/> Output: a4
+    <br/>
+    <br/> String Given: aaabaaaaccaaaaba
+    <br/> Output: a3ba4c2a4ba
+    <br/>
+    <br/> String Given: abcd
+    <br/> Output: abcd
+    <br/>
+  </P>
+</div>
+<br/>
+<p>Your Results:</p>
+<div id="results3"></div>
+</body>
+
+</html>
