@@ -179,18 +179,20 @@
                     repeatCounter = 0;
                 }
             }
+
             return accumulator;
         }
 
-        function Q3_regex(string1) {
-            return string1.replace(/(.)\1+/g, function(match, first){
-                return first + match.length;
-            });
-        }
+        const Q3_regex = string1 =>
+            string1.replace(
+                /(.)\1+/g,
+                (match, first) => first + match.length
+            );
 
         function newLine(selector) {
             $(selector).append(document.createElement('br'));
         }
+
         $("#results1").append(Q1(1, 10));
         newLine("#results1");
         $("#results1").append(Q1(3, 23));
