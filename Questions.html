@@ -27,7 +27,7 @@
         // https://getfirebug.com/firebug-lite-debug.js as external resource for a build-in console window
 
         function primes(start, end) {
-            const n = end - start + 2;
+            const n = end + 1;
 
             const sieve = new Array(n).fill(true)
 
@@ -40,7 +40,7 @@
             }
 
             return sieve.reduce((acc, isPrime, index) => {
-                return (isPrime && index > 1) ? [...acc, index] : acc;
+                return (isPrime && index >= start && index > 1) ? [...acc, index] : acc;
             }, []);
 
         }
@@ -48,7 +48,6 @@
         function Q1(number1, number2) {
             var returnValue = "";
 
-            //Q1 your code here
             returnValue = primes(number1, number2);
 
             return returnValue.join(' ');
@@ -186,16 +185,22 @@
             });
         }
 
-        /* $("#results1").append(Q1(1, 100)); */
-        /* $("#results1").append(Q1(1, 10)); */
-        $("#results1").append(Q1(1, 23));
+        function newLine(selector) {
+            $(selector).append(document.createElement('br'));
+        }
+        $("#results1").append(Q1(1, 10));
+        newLine("#results1");
+        $("#results1").append(Q1(3, 23));
 
         $("#results2").append(Q2(907008));
 
-        /* $("#results3").append(Q3("aaabaaaaccaaaaba")); */
+        $("#results3").append(Q3("aaabaaaaccaaaaba"));
+        newLine("#results3");
         $("#results3").append(Q3_regex("aaabaaaaccaaaaba"));
-        /* $("#results3").append(Q3_ahead("aaabaaaaccaaaaba")); */
-        /* $("#results3").append(Q3_orig("aaabaaaaccaaaaba")); */
+        newLine("#results3");
+        $("#results3").append(Q3_ahead("aabcba"));
+        newLine("#results3");
+        $("#results3").append(Q3_orig("aaaa"));
 
     });//]]>
 
