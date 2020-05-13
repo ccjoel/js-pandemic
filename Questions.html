@@ -9,13 +9,13 @@
 
   <style type="text/css">
    p {
-       padding: 0px 0px 0px 15px;
+       padding-left: 15px;
    }
    #question {
        border: 1px solid gray;
    }
    div {
-       padding: 15px 15px 15px 15px;
+       padding: 15px;
        border: 1px solid blue;
    }
   </style>
@@ -23,11 +23,8 @@
 
   <script type='text/javascript'>//<![CDATA[
     $(function() {
-        // You may use: https://developer.mozilla.org if you need help with syntax
-        // https://getfirebug.com/firebug-lite-debug.js as external resource for a build-in console window
-
         /**
-         * See https://en.wikipedia.org/wiki/Sieve_of_Eratosthenes#Pseudocode
+         * See https://en.wikipedia.org/wiki/Sieve_of_Eratosthenes
          **/
         function primes(start, end) {
             const n = end + 1;
@@ -43,21 +40,21 @@
             }
 
             return sieve.reduce((acc, isPrime, index) => {
-                return (isPrime && index >= start && index > 1) ? [...acc, index] : acc;
+                return (isPrime && index >= start && index > 1) ?
+                       [...acc, index] :
+                       acc;
             }, []);
 
         }
 
         function Q1(number1, number2) {
-            var returnValue = "";
-
-            returnValue = primes(number1, number2);
+            let returnValue = primes(number1, number2);
 
             return returnValue.join(' ');
         }
 
         /**
-         * Given number, returns if it palindrome
+         * Given a positive integer, returns if it is a palindrome
          **/
         function isPalindrome(num) {
             const asString = num + '';
@@ -71,36 +68,29 @@
         }
 
         function Q2(number1) {
-            var returnValue = "";
-
-            /* 1000000 number of digits */
-            /* 2^32 -1 */ /* most likely biggest js number */
-
-            const biggestJsNumber = 1000000; // assumption
-
-            // TODO validate input, validate output
-            for (let counter = number1 + 1; counter < biggestJsNumber; counter++) {
+            for (let counter = number1 + 1; counter < Number.MAX_SAFE_INTEGER; counter++) {
                 if (isPalindrome(counter)) {
                     return counter;
                 }
             }
-
-            return returnValue;
+            return null;
         }
 
         /**
          * Given 'a', and 'aaab', returns 3
          * Given 'a', and 'abb', returns 1
          * Given 'a', and 'b', returns 0
-         * Given 'a', and 'b', returns 0
          **/
         function scanRepeated(character, str) {
             const re = new RegExp(`${character}+`);
             const result = str.match(re);
 
-            return result ? result[0].length : 0;
+            return result ? result[0].length : 0; // use lodash/get
         }
 
+        // TODO for the following alternatives: assert string1 of type string
+
+        // lookahead, with regex
         function Q3(string1) {
             let accumulator = '';
             let index = 0;
@@ -117,48 +107,7 @@
             return accumulator;
         }
 
-        function formatCount(repeatCounter, previous) {
-            const count = repeatCounter > 1 ? repeatCounter : '';
-            return previous + count;
-        }
-
-        /**
-         * Look behind / previous - no love.
-         **/
-        function Q3_orig(string1) {
-            /* const sampleInput = 'aaabaaaaccaaaaba'; */
-
-            let accumulator = '';
-
-            for (
-                let index = 0,
-                    previous = string1[0],
-                    repeatCounter = 0;
-                index < string1.length;
-                index++
-            ) {
-                let current = string1[index];
-
-                if (index === string1.length - 1) {
-                    let addition = current;
-                    if (previous === current) {
-                        repeatCounter++;
-                        addition = '';
-                    }
-                    accumulator += formatCount(repeatCounter, previous);
-                    accumulator += addition;
-                } else if (current === previous) {
-                    repeatCounter++;
-                } else {
-                    accumulator += formatCount(repeatCounter, previous);
-                    repeatCounter = 1;
-                    previous = current;
-                }
-            }
-            return accumulator;
-        }
-
-        // look ahead insted of look behind
+        // full lookahead insted of lookback
         function Q3_ahead(string1) {
 
             let accumulator = '';
@@ -166,6 +115,7 @@
             for (
                 let index = 0,
                     repeatCounter = 0;
+
                 index < string1.length;
                 index++
             ) {
@@ -183,29 +133,41 @@
             return accumulator;
         }
 
+        // Full regex solution, only capture group is one character
         const Q3_regex = string1 =>
             string1.replace(
                 /(.)\1+/g,
-                (match, first) => first + match.length
+                (fullMatch, character) => character + fullMatch.length
             );
 
-        function newLine(selector) {
+        /**
+        * Helpers
+        **/
+        function appendNewLine(selector) {
             $(selector).append(document.createElement('br'));
         }
+        function appendMultiple(selector, arrResults) {
+            arrResults.forEach(result => {
+                $(selector).append(result || '{empty}');
+                appendNewLine(selector);
+            });
+        }
 
-        $("#results1").append(Q1(1, 10));
-        newLine("#results1");
-        $("#results1").append(Q1(3, 23));
+        appendMultiple("#results1", [Q1(1, 10), Q1(3, 23)]);
 
         $("#results2").append(Q2(907008));
 
-        $("#results3").append(Q3("aaabaaaaccaaaaba"));
-        newLine("#results3");
-        $("#results3").append(Q3_regex("aaabaaaaccaaaaba"));
-        newLine("#results3");
-        $("#results3").append(Q3_ahead("aabcba"));
-        newLine("#results3");
-        $("#results3").append(Q3_orig("aaaa"));
+        appendMultiple("#results3", [
+            Q3("aaabaaaaccaaaaba"),
+            Q3("a"),
+            Q3("1"),
+            Q3(""),
+            Q3_regex(""),
+            Q3_regex("aaabaaaaccaaaaba"),
+            Q3_regex("aaaa"),
+            Q3_regex("abcd"),
+            Q3_ahead("aabcb11")
+        ]);
 
     });//]]>
 
