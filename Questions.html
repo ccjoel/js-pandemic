@@ -49,15 +49,14 @@
 
         function Q1(number1, number2) {
             let returnValue = primes(number1, number2);
-
             return returnValue.join(' ');
         }
 
         /**
-         * Given a positive integer, returns if it is a palindrome
+         * Given a positive integer, returns if it is a palindrome.
          **/
         function isPalindrome(num) {
-            const asString = num + '';
+            const asString = num.toString();
 
             const reversed = asString
                 .split('')
@@ -67,19 +66,39 @@
             return asString === reversed;
         }
 
-        function Q2(number1) {
-            for (let counter = number1 + 1; counter < Number.MAX_SAFE_INTEGER; counter++) {
+        /**
+         * Given a positive integer K of max 1,000,000 digits
+         * return the next palindrome number, if it exists;
+         * 1,000,000 digits is larger than javascript's maximum JS number.
+         * Returns null if, given a valid input, cannot find the next palindrome within
+         * javascript's integer constraints.
+         **/
+        function Q2(K) {
+            if (!Number.isInteger(K)) {
+                throw new TypeError(`Q2 expects an integer. Received "${K}" of type "${typeof K}".`);
+            }
+            if (K < 0 || K > Number.MAX_SAFE_INTEGER) {
+                throw new RangeError(`Q2 expects a positive integer up to ${Number.MAX_SAFE_INTEGER}.`);
+            }
+
+            // Can still go over safest integer while searching
+            for (let counter = K + 1; counter < Number.MAX_SAFE_INTEGER; counter++) {
                 if (isPalindrome(counter)) {
                     return counter;
                 }
             }
+
             return null;
         }
 
         /**
-         * Given 'a', and 'aaab', returns 3
-         * Given 'a', and 'abb', returns 1
-         * Given 'a', and 'b', returns 0
+         * Scans a string for the length of the character repeating itself until
+         * a different character is found.
+         * That is,
+         * Given 'a', and 'aaab', returns 3.
+         * Given 'a', and 'abb', returns 1.
+         * Given 'a', and 'b', returns 0.
+         * @returns {number}
          **/
         function scanRepeated(character, str) {
             const re = new RegExp(`${character}+`);
@@ -88,10 +107,8 @@
             return result ? result[0].length : 0; // use lodash/get
         }
 
-        // TODO for the following alternatives: assert string1 of type string
-
-        // lookahead, with regex
-        function Q3(string1) {
+        // Compress lookahead, with partial regex
+        function compress_scan(string1) {
             let accumulator = '';
             let index = 0;
 
@@ -107,8 +124,11 @@
             return accumulator;
         }
 
-        // full lookahead insted of lookback
-        function Q3_ahead(string1) {
+        /**
+         * Given that lookbehind (store and compare to previous char) was more involved,
+         * implement by compressing and looking ahead.
+         **/
+        function compress_lookahead(string1) {
 
             let accumulator = '';
 
@@ -134,40 +154,76 @@
         }
 
         // Full regex solution, only capture group is one character
-        const Q3_regex = string1 =>
+        const compress_regex = string1 =>
             string1.replace(
                 /(.)\1+/g,
                 (fullMatch, character) => character + fullMatch.length
             );
 
-        /**
-        * Helpers
-        **/
+        function Q3(string1) {
+            if (typeof string1 !== 'string') {
+                throw new TypeError(`Expected argument for "string1" to be a string, received: ${string1}`);
+            }
+            return compress_lookahead(string1);
+        }
+
+        // ============================== Helpers =============================
         function appendNewLine(selector) {
             $(selector).append(document.createElement('br'));
         }
         function appendMultiple(selector, arrResults) {
+            const element = $(selector); // Find element once on dom
+            // Side effects only
             arrResults.forEach(result => {
-                $(selector).append(result || '{empty}');
+                element.append(result || '{empty}'); // So that we may account for  on results page.
                 appendNewLine(selector);
             });
         }
 
-        appendMultiple("#results1", [Q1(1, 10), Q1(3, 23)]);
-
-        $("#results2").append(Q2(907008));
-
-        appendMultiple("#results3", [
-            Q3("aaabaaaaccaaaaba"),
-            Q3("a"),
-            Q3("1"),
-            Q3(""),
-            Q3_regex(""),
-            Q3_regex("aaabaaaaccaaaaba"),
-            Q3_regex("aaaa"),
-            Q3_regex("abcd"),
-            Q3_ahead("aabcb11")
+        // ================== Appending results to questions ===================
+        appendMultiple('#results1', [
+            Q1(1, 10),
+            Q1(3, 23)
         ]);
+
+        const q2Selector = '#results2';
+
+        $(q2Selector).append(Q2(907008));
+
+        appendNewLine(q2Selector);
+
+        // Example of Q2 that fails some validation
+        let q2error = null;
+        try {
+            q2error = Q2('a');
+        } catch(e) {
+            // We will always fallback to append regardless of error type
+            q2error = `Caught expected error: ${e.message}`;
+        }
+        $(q2Selector).append(q2error);
+
+        const q3Selector = '#results3';
+        appendMultiple(q3Selector, [
+            Q3('aaabaaaaccaaaaba'),
+            Q3('a'),
+            Q3('1'),
+            Q3(''),
+            compress_regex('aaabaaaaccaaaaba'),
+            compress_lookahead('aaaa'),
+            compress_lookahead('c'),
+            compress_lookahead('caaazwwbb'),
+            compress_regex('abcd'),
+            compress_scan('aabcb11')
+        ]);
+
+        // Example of Q2 that fails some validation
+        let q3error = null;
+        try {
+            q3error = Q3(4);
+        } catch(e) {
+            q3error = `Caught expected error: ${e.message}.`;
+        }
+        $(q3Selector).append(q3error);
 
     });//]]>
 
