@@ -23,6 +23,19 @@
 
   <script type='text/javascript'>//<![CDATA[
     $(function() {
+
+        // ========================= Conventions ===============================
+
+        /**
+         * - Use NOTE for meta on solution, mostly over explains for interview purposes.
+         *   Example: Declare with `const` if variable does not change, UPPERCASE_CONVENTION if real constant (eg PI)
+         * - Use camelcase for fn and variable names
+         * - Use snake_case for solution variations
+         * - Use Startcase for original question fn names (eg Q1), which are "public" fns
+         **/
+
+        // =========================== Solutions ===============================
+
         /**
          * See https://en.wikipedia.org/wiki/Sieve_of_Eratosthenes
          **/
@@ -104,10 +117,11 @@
             const re = new RegExp(`${character}+`);
             const result = str.match(re);
 
-            return result ? result[0].length : 0; // use lodash/get
+            return result ? result[0].length : 0; // can use lodash/get
         }
 
         // Compress lookahead, with partial regex
+        // snake_case convention for variations of same fn
         function compress_scan(string1) {
             let accumulator = '';
             let index = 0;
@@ -153,16 +167,20 @@
             return accumulator;
         }
 
-        // Full regex solution, only capture group is one character
+        // NOTE Full regex solution, lone capture group is a character
         const compress_regex = string1 =>
             string1.replace(
                 /(.)\1+/g,
                 (fullMatch, character) => character + fullMatch.length
             );
 
+        /**
+         * Compresses a string.
+         * eg: "bdddda" => "bd4a"
+         **/
         function Q3(string1) {
             if (typeof string1 !== 'string') {
-                throw new TypeError(`Expected argument for "string1" to be a string, received: ${string1}`);
+                throw new TypeError(`Q3: Expected argument for "string1" to be a string, received: ${string1}`);
             }
             return compress_lookahead(string1);
         }
@@ -172,15 +190,16 @@
             $(selector).append(document.createElement('br'));
         }
         function appendMultiple(selector, arrResults) {
-            const element = $(selector); // Find element once on dom
-            // Side effects only
+            const element = $(selector);             // NOTE Find element on dom once
+            // NOTE Side effects only
             arrResults.forEach(result => {
-                element.append(result || '{empty}'); // So that we may account for  on results page.
+                element.append(result || '{empty}'); // NOTE {empty} used to account result on page.
                 appendNewLine(selector);
             });
         }
 
-        // ================== Appending results to questions ===================
+        // ===================== Append results to questions ===================
+
         appendMultiple('#results1', [
             Q1(1, 10),
             Q1(3, 23)
