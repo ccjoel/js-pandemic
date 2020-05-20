@@ -1,15 +1,35 @@
+const isNodeEnv = typeof module !== 'undefined' && module.exports;
 
-// ========================= Conventions ===============================
+// ============================== SOME HELPERS =================================
+
+function reverseString(str) {
+    return str
+        .split('')
+        .reverse('')
+        .join('');
+}
 
 /**
- * - Use NOTE for meta on solution, mostly over explains for interview purposes.
- *   Example: Declare with `const` if variable does not change, UPPERCASE_CONVENTION if real constant (eg PI)
- * - Use camelcase for fn and variable names
- * - Use snake_case for solution variations
- * - Use Startcase for original question fn names (eg Q1), which are "public" fns
+ * Given a positive integer, returns if it is a palindrome.
  **/
+function isPalindrome(num) {
+    const asString = num.toString();
+    const reversed = reverseString(asString);
+    return asString === reversed;
+}
 
-// =========================== Solutions ===============================
+/**
+ * Returns a string without its last character.
+ **/
+function shaveLast(str) {
+    return str.substring(0, str.length - 1);
+}
+
+const _even = num => num % 2 === 0;
+const _odd = num => !_even(num);
+
+// ================================= MAIN fns ==================================
+
 
 /**
  * See https://en.wikipedia.org/wiki/Sieve_of_Eratosthenes
@@ -35,106 +55,66 @@ function primes(start, end) {
 
 }
 
-function Q1(number1, number2) {
-    let returnValue = primes(number1, number2);
-    return returnValue.join(' ');
-}
-
-function reverseString(str) {
-    return str
-        .split('')
-        .reverse('')
-        .join('');
-}
-
 /**
- * Given a positive integer, returns if it is a palindrome.
- **/
-function isPalindrome(num) {
-    const asString = num.toString();
-    const reversed = reverseString(asString);
-
-    return asString === reversed;
-}
-
-/**
- * nextPalindrome: given a number, returns the next number which is a palindrome, up to 1,000,000 digits.
- * @param {BigInt|string} num - a number which will be used as base for next palindrome number.  * @returns {BigInt}
- **/
-function _nextPalindrome(num) {
-    const asString = num.toString();
-    const isEven = asString.length % 2 === 0;
-
-    const half = asString.length / 2;
-
-    if (isEven) {
-        const left = asString.substring(0, half);
-        const right = asString.substring(half);
-        const reversedLeft = reverseString(left);
-
-        // right < reversed(left), it fits!
-        if (right < reversedLeft) {
-            return BigInt(left + reversedLeft);
-        }
-
-        // else reversed(left) < right, doesn't fit and we have to increment left
-        const increased = (BigInt(left) + 1n).toString();
-        return BigInt(increased + reverseString(increased));
-    }
-
-    // else odd
-
-    const pivotIndex = Math.floor(half);
-    const left = asString.substring(0, pivotIndex);
-    const middle = asString[pivotIndex];
-    const right = asString.substring(pivotIndex + 1);
-
-    const reversedLeft = reverseString(left);
-
-    // right < reversed(left), it fits!
-    if (right < reversedLeft) {
-        return BigInt(left + middle + reversedLeft);
-    }
-
-    // else reversed(left) < right, doesn't fit and we have to increment middle
-    const increased = (BigInt(left + middle) + 1n).toString();
-    return BigInt(increased + reverseString(increased.substring(0, increased.length - 1)));
-}
-
-/**
+ * _nextPalindrome: given a numeric string, returns the next number which is a palindrome, up to 1,000,000 digits.
+ * @param {string} asString - a number as string which will be used as base for next palindrome number.
  *
- * ...   |string|number
- * If it is a number,
- * it must be less than Number.MAX_SAFE_INTEGER...
+ * Nomenclature:
+ * A number can have odd or even length.
+ *
+ * For a given number 123456 of even length:
+ *   left | middle | right = '123' | '' | '456'
+ * given a number of odd length 1234567:
+ *   left | middle | right = '123' | '4' | '567'
+ *
+ * In a simplified odd-length example with 1234567:
+ * palindrome basis = 1234. That is, left + middle; used to reverse and calculate the rest of the palindrome.
+ * then a proper rightReplacement = 4321 for use on the rest of the palindrome.
+ *
+ * @returns {bigint}
  **/
-function nextPalindrome(num) {
-    // TODO validate, and call _nextPalindrome
+function _nextPalindrome(asString) {
+    const isOdd = _odd(asString.length);
+    const pivotIndex = Math.floor(asString.length / 2);
+
+    // Given that some strings have odd length, add logic for the presence of a middle number, or none (for even length)
+    const left = asString.substring(0, pivotIndex);
+    const middle = isOdd ? asString[pivotIndex] : '';
+    const right = asString.substring(pivotIndex + (isOdd ? 1 : 0));
+
+    // Palindrome basis and replacement
+    let basis = left + middle;
+    let rightReplacement = reverseString(left);
+
+    // When original right value is greater than replacement
+    //   then increase the basis of the palindrome and recalculate replacement
+    if (right >= rightReplacement) {
+        basis = (BigInt(basis) + 1n).toString();
+        rightReplacement = reverseString(isOdd ? shaveLast(basis) : basis);
+    }
+
+    return BigInt(basis + rightReplacement);
 }
 
-
-/**
- * Given a positive integer K of max 1,000,000 digits
- * return the next palindrome number, if it exists;
- * 1,000,000 digits is larger than javascript's maximum JS number.
- * Returns null if, given a valid input, cannot find the next palindrome within
- * javascript's integer constraints.
- **/
-function Q2(K) {
-    if (!Number.isInteger(K)) {
-        throw new TypeError(`Q2 expects an integer. Received "${K}" of type "${typeof K}".`);
+function nextPalindrome(num) {
+    if (typeof num === 'number' && num > Number.MAX_SAFE_INTEGER) {
+        throw RangeError('nextPalindrome: when using numbers, please ensure to provide a positive safe js integer.');
     }
-    if (K < 0 || K > Number.MAX_SAFE_INTEGER) {
-        throw new RangeError(`Q2 expects a positive integer up to ${Number.MAX_SAFE_INTEGER}.`);
+    if (Array.isArray(num)) {
+        throw TypeError('nextPalindrome: expected a numeric string, number, or bigint, but received an array.');
+    }
+    if (num <= 0) {
+        throw RangeError('nextPalindrome: please provide a positive (> 0) numberic (or equivalent) value.');
     }
 
-    // Can still go over safest integer while searching
-    for (let counter = K + 1; counter < Number.MAX_SAFE_INTEGER; counter++) {
-        if (isPalindrome(counter)) {
-            return counter;
-        }
+    let input = num.toString();
+
+    // TODO... fix for 99 cases as below. Don't have time now.
+    if (input.match(/^9+$/)) {
+        input = "0" + input;
     }
 
-    return null;
+    return _nextPalindrome(input);
 }
 
 /**
@@ -199,7 +179,8 @@ function compress_lookahead(string1) {
 
     return accumulator;
 }
-// NOTE Full regex solution, lone capture group is a character
+
+// Full regex solution, lone capture group is a character
 const compress_regex = string1 =>
       string1.replace(
           /(.)\1+/g,
@@ -212,21 +193,51 @@ const compress_algorithms = {
     lookahead: compress_lookahead
 };
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+// ========================== PREVIOUS / OLD ===================================
+
 /**
- * Compresses a string.
- * eg: "bdddda" => "bd4a"
+ * Given a positive integer K of max 1,000,000 digits
+ * return the next palindrome number, if it exists;
+ * 1,000,000 digits is larger than javascript's maximum JS number.
+ * Returns null if, given a valid input, cannot find the next palindrome within
+ * javascript's integer constraints.
  **/
-function Q3(string1, algo='lookahead') {
-    if (typeof string1 !== 'string') {
-        throw new TypeError(`Q3: Expected argument for "string1" to be a string, received: ${string1}`);
+function Q2_old(K) {
+    if (!Number.isInteger(K)) {
+        throw new TypeError(`Q2 expects an integer. Received "${K}" of type "${typeof K}".`);
     }
-    const compress = compress_algorithms[algo];
-
-    if (!compress) {
-        const available = Object.getOwnPropertyNames(compress_algorithms).join(', ');
-        throw new RangeError(`Q3: Expected algo algorithm to be one of ${available}, but got ${algo}.`);
+    if (K < 0 || K > Number.MAX_SAFE_INTEGER) {
+        throw new RangeError(`Q2 expects a positive integer up to ${Number.MAX_SAFE_INTEGER}.`);
     }
 
-    return compress[algo](string1);
-    // return compress_lookahead(string1);
+    // Can still go over safest integer while searching
+    for (let counter = K + 1; counter < Number.MAX_SAFE_INTEGER; counter++) {
+        // This is very slow for bigger inputs close to Number.MAX_SAFE_INTEGER
+        if (isPalindrome(counter)) {
+            return counter;
+        }
+    }
+
+    return null;
+}
+
+if (isNodeEnv) {
+    module.exports = {
+        primes,
+        nextPalindrome,
+        compress_regex
+    };
 }

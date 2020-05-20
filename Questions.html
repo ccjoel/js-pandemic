@@ -21,230 +21,118 @@
   </style>
   <title> by ICS</title>
 
-  <script type='text/javascript'>//<![CDATA[
+  <!-- Load functions -->
+  <script src="index.js"></script>
+
+  <script type='text/javascript'>
     $(function() {
 
-        // ========================= Conventions ===============================
+    // ========================= Conventions ===============================
+    /**
+    * - NOTE for meta on solution, mostly over explains for interview purposes.
+    *
+    * Moved function implementation to index.js
+    **/
 
-        /**
-         * - Use NOTE for meta on solution, mostly over explains for interview purposes.
-         *   Example: Declare with `const` if variable does not change, UPPERCASE_CONVENTION if real constant (eg PI)
-         * - Use camelcase for fn and variable names
-         * - Use snake_case for solution variations
-         * - Use Startcase for original question fn names (eg Q1), which are "public" fns
-         **/
+    // ============================== DOM Helpers =============================
 
-        // =========================== Solutions ===============================
+    function appendNewLine(selector) {
+        $(selector).append(document.createElement('br'));
+    }
 
-        /**
-         * See https://en.wikipedia.org/wiki/Sieve_of_Eratosthenes
-         **/
-        function primes(start, end) {
-            const n = end + 1;
+    function appendMultiple(selector, arrResults) {
+        const element = $(selector);             // NOTE Find element on dom once
+        // NOTE Side effects only
+        arrResults.forEach(result => {
+            element.append(result || '{empty}'); // NOTE {empty} used to account result on page.
+            appendNewLine(selector);
+        });
+    }
 
-            const sieve = new Array(n).fill(true)
+    // ============================== Q Solutions ===================================
 
-            for (let x = 2; x <= Math.sqrt(n); x++) {
-                if (sieve[x]) {
-                    for (let y = Math.pow(x, 2); y <= n; y += x) {
-                        sieve[y] = false;
-                    }
-                }
-            }
+    /**
+    * Generates all prime numbers between two given numbers.
+    **/
+    function Q1(number1, number2) {
+        let returnValue = primes(number1, number2);
+        return returnValue.join(' ');
+    }
 
-            return sieve.reduce((acc, isPrime, index) => {
-                return (isPrime && index >= start && index > 1) ?
-                       [...acc, index] :
-                       acc;
-            }, []);
+    /* Given a positive integer number, generates the next palindrome. */
+    function Q2(K) {
+        return nextPalindrome(K);
+    }
 
+    /**
+    * Compresses a string.
+    * eg: "bdddda" => "bd4a"
+    **/
+    function Q3(string1, algo='lookahead') {
+        if (typeof string1 !== 'string') {
+            throw new TypeError(`Q3: Expected argument for "string1" to be a string, received: ${string1}`);
         }
-
-        function Q1(number1, number2) {
-            let returnValue = primes(number1, number2);
-            return returnValue.join(' ');
+        const compress = compress_algorithms[algo];
+    
+        if (!compress) {
+            const available = Object.getOwnPropertyNames(compress_algorithms).join(', ');
+            throw new RangeError(`Q3: Expected algo algorithm to be one of ${available}, but got ${algo}.`);
         }
+    
+        return compress(string1);
+    }
 
-        /**
-         * Given a positive integer, returns if it is a palindrome.
-         **/
-        function isPalindrome(num) {
-            const asString = num.toString();
 
-            const reversed = asString
-                .split('')
-                .reverse()
-                .join('');
+    // ===================== Append results to questions ===================
 
-            return asString === reversed;
-        }
+    appendMultiple('#results1', [
+        Q1(1, 10),
+        Q1(3, 23)
+    ]);
 
-        /**
-         * Given a positive integer K of max 1,000,000 digits
-         * return the next palindrome number, if it exists;
-         * 1,000,000 digits is larger than javascript's maximum JS number.
-         * Returns null if, given a valid input, cannot find the next palindrome within
-         * javascript's integer constraints.
-         **/
-        function Q2(K) {
-            if (!Number.isInteger(K)) {
-                throw new TypeError(`Q2 expects an integer. Received "${K}" of type "${typeof K}".`);
-            }
-            if (K < 0 || K > Number.MAX_SAFE_INTEGER) {
-                throw new RangeError(`Q2 expects a positive integer up to ${Number.MAX_SAFE_INTEGER}.`);
-            }
+    const q2Selector = '#results2';
 
-            // Can still go over safest integer while searching
-            for (let counter = K + 1; counter < Number.MAX_SAFE_INTEGER; counter++) {
-                if (isPalindrome(counter)) {
-                    return counter;
-                }
-            }
+    appendMultiple(q2Selector, [
+        Q2(907008).toString(),
+        Q2('90700828734').toString(),
+        Q2(2387384734844343n).toString(),
+    ]);
 
-            return null;
-        }
+    // Example of Q2 that fails some validation
+    let q2error = null;
+    try {
+        q2error = Q2('a');
+    } catch(e) {
+        // NOTE We will always fallback to append regardless of error type
+        q2error = `Caught expected error: ${e.message}`;
+    }
 
-        /**
-         * Scans a string for the length of the character repeating itself until
-         * a different character is found.
-         * That is,
-         * Given 'a', and 'aaab', returns 3.
-         * Given 'a', and 'abb', returns 1.
-         * Given 'a', and 'b', returns 0.
-         * @returns {number}
-         **/
-        function scanRepeated(character, str) {
-            const re = new RegExp(`${character}+`);
-            const result = str.match(re);
+    $(q2Selector).append(q2error);
 
-            return result ? result[0].length : 0; // can use lodash/get
-        }
+    const q3Selector = '#results3';
+    appendMultiple(q3Selector, [
+        Q3('aaabaaaaccaaaaba'),
+        Q3('a'),
+        Q3('1'),
+        Q3(''),
+        Q3('aaabaaaaccaaaaba', 'regex'),
+        Q3('aaaa', 'lookahead'),
+        Q3('c', 'lookahead'),
+        Q3('caaazwwbb', 'lookahead'),
+        Q3('abcd', 'regex'),
+        Q3('aabcb11', 'mixed')
+    ]);
 
-        // Compress lookahead, with partial regex
-        // snake_case convention for variations of same fn
-        function compress_scan(string1) {
-            let accumulator = '';
-            let index = 0;
+    // Example of Q2 that fails some validation
+    let q3error = null;
+    try {
+        q3error = Q3(4);
+    } catch(e) {
+        q3error = `Caught expected error: ${e.message}.`;
+    }
+    $(q3Selector).append(q3error);
 
-            while (index < string1.length) {
-                const currentChar = string1[index];
-                const occurrences = scanRepeated(currentChar, string1.substring(index));
-                const displayCount = occurrences === 1 ? '' : occurrences;
-
-                accumulator += currentChar + displayCount;
-                index += occurrences;
-            }
-
-            return accumulator;
-        }
-
-        /**
-         * Given that lookbehind (store and compare to previous char) was more involved,
-         * implement by compressing and looking ahead.
-         **/
-        function compress_lookahead(string1) {
-
-            let accumulator = '';
-
-            for (
-                let index = 0,
-                    repeatCounter = 0;
-
-                index < string1.length;
-                index++
-            ) {
-                repeatCounter++;
-                const current = string1[index];
-                const next = string1[index + 1];
-
-                if (current !== next) {
-                    const displayCount = repeatCounter === 1 ? '' : repeatCounter;
-                    accumulator += current + displayCount;
-                    repeatCounter = 0;
-                }
-            }
-
-            return accumulator;
-        }
-
-        // NOTE Full regex solution, lone capture group is a character
-        const compress_regex = string1 =>
-            string1.replace(
-                /(.)\1+/g,
-                (fullMatch, character) => character + fullMatch.length
-            );
-
-        /**
-         * Compresses a string.
-         * eg: "bdddda" => "bd4a"
-         **/
-        function Q3(string1) {
-            if (typeof string1 !== 'string') {
-                throw new TypeError(`Q3: Expected argument for "string1" to be a string, received: ${string1}`);
-            }
-            return compress_lookahead(string1);
-        }
-
-        // ============================== Helpers =============================
-        function appendNewLine(selector) {
-            $(selector).append(document.createElement('br'));
-        }
-        function appendMultiple(selector, arrResults) {
-            const element = $(selector);             // NOTE Find element on dom once
-            // NOTE Side effects only
-            arrResults.forEach(result => {
-                element.append(result || '{empty}'); // NOTE {empty} used to account result on page.
-                appendNewLine(selector);
-            });
-        }
-
-        // ===================== Append results to questions ===================
-
-        appendMultiple('#results1', [
-            Q1(1, 10),
-            Q1(3, 23)
-        ]);
-
-        const q2Selector = '#results2';
-
-        $(q2Selector).append(Q2(907008));
-
-        appendNewLine(q2Selector);
-
-        // Example of Q2 that fails some validation
-        let q2error = null;
-        try {
-            q2error = Q2('a');
-        } catch(e) {
-            // We will always fallback to append regardless of error type
-            q2error = `Caught expected error: ${e.message}`;
-        }
-        $(q2Selector).append(q2error);
-
-        const q3Selector = '#results3';
-        appendMultiple(q3Selector, [
-            Q3('aaabaaaaccaaaaba'),
-            Q3('a'),
-            Q3('1'),
-            Q3(''),
-            compress_regex('aaabaaaaccaaaaba'),
-            compress_lookahead('aaaa'),
-            compress_lookahead('c'),
-            compress_lookahead('caaazwwbb'),
-            compress_regex('abcd'),
-            compress_scan('aabcb11')
-        ]);
-
-        // Example of Q2 that fails some validation
-        let q3error = null;
-        try {
-            q3error = Q3(4);
-        } catch(e) {
-            q3error = `Caught expected error: ${e.message}.`;
-        }
-        $(q3Selector).append(q3error);
-
-    });//]]>
+   });
 
     </script>
 
