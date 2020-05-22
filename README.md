@@ -13,10 +13,9 @@ divisible by 1 and itself. Output the results into the results element below.
 
 ### Example
 
-Primes between 1 and 10
+Primes between 3 and 10
 
 ```
-2
 3
 5
 7
@@ -27,37 +26,32 @@ Primes between 1 and 10
 
 A positive integer is called a palindrome if its representation in the decimal 
 system is the same when read from left to right and from right to left.
-For a given positive integer K of not more than 1000000 digits, write the 
-value of the smallest palindrome larger than K to output.
-Numbers are always displayed without leading zeros.
+For a given positive integer of not more than 1000000 digits, write the 
+value of the next smallest palindrome.
 
 ### Example
 
-Number Given: `808`
+Number Given: `809`
 
 Output: `818`
 
-Number Given: `2133`
+Number Given: `2134`
 
 Output: `2222`
     
     
 ## Question 3
 
-Write a simple string compression algorithm.
+Simple string compression.
 
-If a character `ch` occurs `n > 1` times in a row, then it will be represented by `<ch><n>`.
+If a character occurs `n > 1` times in a row, then it will be represented by `<character><n>`.
 
 ### Example
 
-String Given: `aaaa`
+String Given: `aabaaaaccaaaaba`
 
-Output: `a4`
+Output: `a2ba4c2a4ba`
 
-String Given: `aaabaaaaccaaaaba`
+String Given: `fghd`
 
-Output: `a3ba4c2a4ba`
-
-String Given: `abcd`
-
-Output: `abcd`
+Output: `fghd`
