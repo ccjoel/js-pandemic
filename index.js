@@ -25,6 +25,13 @@ function shaveLast(str) {
     return str.substring(0, str.length - 1);
 }
 
+/**
+ * Returns a string without its first character.
+ **/
+function shaveFirst(str) {
+    return str.substring(1);
+}
+
 const _even = num => num % 2 === 0;
 const _odd = num => !_even(num);
 
@@ -67,30 +74,40 @@ function primes(start, end) {
  * given a number of odd length 1234567:
  *   left | middle | right = '123' | '4' | '567'
  *
- * In a simplified odd-length example with 1234567:
- * palindrome basis = 1234. That is, left + middle; used to reverse and calculate the rest of the palindrome.
- * then a proper rightReplacement = 4321 for use on the rest of the palindrome.
+ * In a simplified even-length example with 123267:
+ * palindrome basis = 123. Used to reverse and calculate the rest of the palindrome.
+ * then a proper rightReplacement = 321 for use on the rest of the palindrome.
  *
  * @returns {bigint}
  **/
 function _nextPalindrome(asString) {
-    const isOdd = _odd(asString.length);
+    const isOddLength = _odd(asString.length);
     const pivotIndex = Math.floor(asString.length / 2);
 
     // Given that some strings have odd length, add logic for the presence of a middle number, or none (for even length)
     const left = asString.substring(0, pivotIndex);
-    const middle = isOdd ? asString[pivotIndex] : '';
-    const right = asString.substring(pivotIndex + (isOdd ? 1 : 0));
+    const middle = isOddLength ? asString[pivotIndex] : '';
+    const right = asString.substring(pivotIndex + (isOddLength ? 1 : 0));
 
-    // Palindrome basis and replacement
+    let rightReplacement = reverseString(left); // Reverse left without middle
+
     let basis = left + middle;
-    let rightReplacement = reverseString(left);
 
     // When original right value is greater than replacement
     //   then increase the basis of the palindrome and recalculate replacement
     if (right >= rightReplacement) {
-        basis = (BigInt(basis) + 1n).toString();
-        rightReplacement = reverseString(isOdd ? shaveLast(basis) : basis);
+        const newBasis = (BigInt(basis) + 1n).toString();
+        const didDigitsIncrease = newBasis.length > basis.length;
+
+        basis = newBasis;
+        rightReplacement = reverseString(basis);
+
+        if (didDigitsIncrease) { // For example, basis went from 99 to 100 (now 3 digits)
+            basis = shaveLast(basis);
+        }
+        if (isOddLength) { // Remove middle from right replacement
+            rightReplacement = shaveFirst(rightReplacement);
+        }
     }
 
     return BigInt(basis + rightReplacement);
@@ -107,49 +124,9 @@ function nextPalindrome(num) {
         throw RangeError('nextPalindrome: please provide a positive (> 0) numberic (or equivalent) value.');
     }
 
-    let input = num.toString();
-
-    // TODO... fix for 99 cases as below. Don't have time now.
-    if (input.match(/^9+$/)) {
-        input = "0" + input;
-    }
-
-    return _nextPalindrome(input);
+    return _nextPalindrome(num.toString());
 }
 
-/**
- * Scans a string for the length of the character repeating itself until
- * a different character is found.
- * That is,
- * Given 'a', and 'aaab', returns 3.
- * Given 'a', and 'abb', returns 1.
- * Given 'a', and 'b', returns 0.
- * @returns {number}
- **/
-function scanRepeated(character, str) {
-    const re = new RegExp(`${character}+`);
-    const result = str.match(re);
-
-    return result ? result[0].length : 0; // can use lodash/get
-}
-
-// Compress lookahead, with partial regex
-// snake_case convention for variations of same fn
-function compress_scan(string1) {
-    let accumulator = '';
-    let index = 0;
-
-    while (index < string1.length) {
-        const currentChar = string1[index];
-        const occurrences = scanRepeated(currentChar, string1.substring(index));
-        const displayCount = occurrences === 1 ? '' : occurrences;
-
-        accumulator += currentChar + displayCount;
-        index += occurrences;
-    }
-
-    return accumulator;
-}
 
 /**
  * Given that lookbehind (store and compare to previous char) was more involved,
@@ -188,51 +165,10 @@ const compress_regex = string1 =>
       );
 
 const compress_algorithms = {
-    mixed: compress_scan,
     regex: compress_regex,
     lookahead: compress_lookahead
 };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-// ========================== PREVIOUS / OLD ===================================
-
-/**
- * Given a positive integer K of max 1,000,000 digits
- * return the next palindrome number, if it exists;
- * 1,000,000 digits is larger than javascript's maximum JS number.
- * Returns null if, given a valid input, cannot find the next palindrome within
- * javascript's integer constraints.
- **/
-function Q2_old(K) {
-    if (!Number.isInteger(K)) {
-        throw new TypeError(`Q2 expects an integer. Received "${K}" of type "${typeof K}".`);
-    }
-    if (K < 0 || K > Number.MAX_SAFE_INTEGER) {
-        throw new RangeError(`Q2 expects a positive integer up to ${Number.MAX_SAFE_INTEGER}.`);
-    }
-
-    // Can still go over safest integer while searching
-    for (let counter = K + 1; counter < Number.MAX_SAFE_INTEGER; counter++) {
-        // This is very slow for bigger inputs close to Number.MAX_SAFE_INTEGER
-        if (isPalindrome(counter)) {
-            return counter;
-        }
-    }
-
-    return null;
-}
 
 if (isNodeEnv) {
     module.exports = {
