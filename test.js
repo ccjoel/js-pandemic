@@ -66,7 +66,7 @@ describe('nextPalindrome', () => {
     });
 
     it('is fast with big number input, close to MAX_SAFE_INTEGER', () => {
-        const input = '4503599627370495'; // Math.floor(Number.MAX_SAFE_INTEGER / 2)
+        const input = 4503599627370495; // Math.floor(Number.MAX_SAFE_INTEGER / 2)
         const expected = s(4503599669953054n);
         const actual = nextPalindrome(input);
 
