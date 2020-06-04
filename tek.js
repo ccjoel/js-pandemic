@@ -73,7 +73,7 @@ const answer = sample.reduce((acc, currValue) => {
   const classifications = matchesTLD(currValue);
 
   const lengthMatch = currValue.match(/(?:.*\.)*(.*)\..+$/);
-  if (lengthMatch[captureGroupIndex].length > 10) {
+  if (lengthMatch && lengthMatch[captureGroupIndex].length > 10) {
     classifications.push('LONG');
   }
 
